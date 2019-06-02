@@ -164,7 +164,7 @@ int main(int argc, char*argv[])
     objs.resize((faces.size()));
 
     
-    // loop through each face
+    /// loop through each face and find the best png image to map to
     for(int i=0;i<faces.size(); i++){
 
             double theta = 361.0;
@@ -191,7 +191,7 @@ int main(int argc, char*argv[])
         faces[i].uvData.fileName = imgs[imgIndex].fileName;
 
 
-     /// need to do some UV mapping
+     /// need to do some UV mapping ( looping through each face
 
 
         MatrixXd K(3,3);
@@ -214,11 +214,11 @@ int main(int argc, char*argv[])
         VectorXd Xw2(4);
         VectorXd Xw3(4);
 
-        Xw1<<p1.x,p1.y,p1.z,1;
+        Xw1<<p1.x,p1.y,p1.z,1; // homogenous veticies of the face
         Xw2<<p2.x,p2.y,p2.z,1;
         Xw3<<p3.x,p3.y,p3.z,1;
         // UV Calculation
-        XcHAT1 = K*T*Xw1;
+        XcHAT1 = K*T*Xw1; // 3D image coordinates of texture
         XcHAT2 = K*T*Xw2;
         XcHAT3 = K*T*Xw3;
 
@@ -231,7 +231,7 @@ int main(int argc, char*argv[])
         MatrixXd invK(3,3);
         invK = K.inverse();
 
-        Xc1 = (invK)*XcHAT1; // convert 3d coordinates to 2d
+        Xc1 = (invK)*XcHAT1; // convert 3d coordinates to 2d by multiplying by K^-1
         Xc2 = (invK)*XcHAT2;
         Xc3 = (invK)*XcHAT3;
 
@@ -240,7 +240,7 @@ int main(int argc, char*argv[])
         VectorXd uv2(2);
         VectorXd uv3(2);
 
-        uv1<<Xc1(0)/Xc1(2),Xc1(1)/Xc1(2);
+        uv1<<Xc1(0)/Xc1(2),Xc1(1)/Xc1(2); // normilization
         uv2<<Xc2(0)/Xc2(2),Xc2(1)/Xc2(2);
         uv3<<Xc3(0)/Xc3(2),Xc3(1)/Xc3(2);
 
@@ -254,13 +254,13 @@ int main(int argc, char*argv[])
         objs[i].uv2<<uv2(0),uv2(1);
         objs[i].uv3 = VectorXd(2);
         objs[i].uv3<<uv3(0),uv3(1);
-        objs[i].imgFile = remove_extension(faces[i].uvData.fileName, ".png");  // make sure extension is correct !!!
+        objs[i].imgFile = remove_extension(faces[i].uvData.fileName, ".png"); 
 
     }
     
     
     
-    writeOBJ(objs);
+    writeOBJ(objs); // write the objs and mtls to files
 
 
         return EXIT_SUCCESS;
